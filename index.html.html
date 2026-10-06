@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Willowra — Bedtime Audio & Sleep Wellness for Teens</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        midnight: '#0B0F19',
+                        deepspace: '#111827',
+                        indigoGlow: '#4F46E5',
+                        cyanGlow: '#06B6D4',
+                        amberGlow: '#F59E0B',
+                        purpleGlow: '#8B5CF6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'glow': 'glow 3s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-12px)' },
+                        },
+                        glow: {
+                            '0%': { opacity: '0.4', filter: 'blur(20px)' },
+                            '100%': { opacity: '0.8', filter: 'blur(30px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for interactive sleep metrics preview -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom scrollbar and backdrop styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0B0F19;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1F2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+        .glass-card {
+            background: rgba(17, 24, 39, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card-hover:hover {
+            background: rgba(30, 41, 59, 0.75);
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px -10px rgba(79, 70, 229, 0.25);
+        }
+        .text-gradient {
+            background: linear-gradient(135deg, #A5B4FC 0%, #38BDF8 50%, #C084FC 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .text-gold-gradient {
+            background: linear-gradient(135deg, #FDE047 0%, #F59E0B 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .star-field {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-midnight text-slate-200 font-sans antialiased selection:bg-indigoGlow selection:text-white overflow-x-hidden relative">
+
+    <canvas id="starfield" class="star-field"></canvas>
+
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="glass-card rounded-2xl px-5 py-3 flex items-center justify-between shadow-2xl">
+                <!-- Brand Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-cyan-400 p-0.5 shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform">
+                        <div class="w-full h-full bg-midnight rounded-[10px] flex items-center justify-center">
+                            <i data-lucide="moon" class="w-5 h-5 text-cyan-400 fill-cyan-400/20"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+                            Willowra <span class="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Teen Sleep</span>
+                        </span>
+                    </div>
+                </a>
+
+                <!-- Desktop Nav -->
+                <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+                    <a href="#player" class="hover:text-cyan-400 transition-colors">Audio Player</a>
+                    <a href="#features" class="hover:text-cyan-400 transition-colors">App Features</a>
+                    <a href="#education" class="hover:text-cyan-400 transition-colors">Teen Sleep Health</a>
+                    <a href="#tools" class="hover:text-cyan-400 transition-colors">Sleep Tools</a>
+                    <a href="#creators" class="hover:text-cyan-400 transition-colors">Creators</a>
+                </nav>
+
+                <!-- Action Button -->
+                <div class="hidden sm:flex items-center gap-3">
+                    <a href="#player" class="px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-indigo-600 to-cyan-500 text-white shadow-lg shadow-indigo-500/25 hover:shadow-cyan-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-2">
+                        <i data-lucide="headphones" class="w-4 h-4"></i> Play Bedtime Audio
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobileMenuBtn" class="md:hidden text-slate-300 hover:text-white p-2">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Drawer -->
+        <div id="mobileDrawer" class="hidden md:hidden max-w-7xl mx-auto px-4 pt-2">
+            <div class="glass-card rounded-2xl p-5 flex flex-col gap-4 text-center border-indigo-500/20">
+                <a href="#player" class="py-2 text-slate-200 font-medium border-b border-slate-800">Audio Player</a>
+                <a href="#features" class="py-2 text-slate-200 font-medium border-b border-slate-800">App Features</a>
+                <a href="#education" class="py-2 text-slate-200 font-medium border-b border-slate-800">Teen Sleep Health</a>
+                <a href="#tools" class="py-2 text-slate-200 font-medium border-b border-slate-800">Sleep Tools</a>
+                <a href="#creators" class="py-2 text-slate-200 font-medium">Creators</a>
+                <a href="#player" class="mt-2 w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-semibold flex items-center justify-center gap-2">
+                    <i data-lucide="headphones" class="w-4 h-4"></i> Listen Now
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+        <section class="min-h-screen pt-32 pb-20 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative overflow-hidden">
+            <!-- Glowing background Orbs -->
+            <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none animate-pulse-slow"></div>
+            <div class="absolute top-1/3 right-10 w-[300px] h-[300px] bg-cyan-500/15 rounded-full blur-[100px] pointer-events-none"></div>
+
+            <div class="max-w-5xl mx-auto text-center relative z-10">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card border-indigo-500/30 text-xs sm:text-sm font-medium text-cyan-300 mb-8 animate-float">
+                    <span class="flex h-2 w-2 rounded-full bg-cyan-400 animate-ping"></span>
+                    Solving the Teenage Sleep Crisis
+                </div>
+
+                <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+                    Restful Nights for <br/>
+                    <span class="text-gradient">Better Teenage Days</span>
+                </h1>
+
+                <p class="text-lg sm:text-xl text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed font-light">
+                    <strong class="text-white font-semibold">Willowra</strong> is a science-backed bedtime audio app designed specifically for teens facing sleep disorders. Restore natural circadian rhythms with custom soundscapes, smart bedtime planning, and sleep tracking.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                    <a href="#player" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-cyan-500 text-white font-bold text-lg shadow-xl shadow-indigo-600/30 hover:shadow-cyan-500/40 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-3">
+                        <i data-lucide="play-circle" class="w-6 h-6"></i> Launch Audio Demo
+                    </a>
+                    <a href="#tools" class="w-full sm:w-auto px-8 py-4 rounded-2xl glass-card text-slate-200 font-semibold text-lg hover:bg-slate-800/80 hover:text-white border-slate-700 hover:border-indigo-500/50 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="calculator" class="w-5 h-5 text-indigo-400"></i> Calculate Sleep Cycle
+                    </a>
+                </div>
+
+                <!-- Hero Stats Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+                    <div class="glass-card p-4 rounded-2xl text-center">
+                        <p class="text-2xl sm:text-3xl font-bold text-cyan-400">73%</p>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-1">Teens Sleep Deprived</p>
+                    </div>
+                    <div class="glass-card p-4 rounded-2xl text-center">
+                        <p class="text-2xl sm:text-3xl font-bold text-indigo-400">8-10 Hrs</p>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-1">Recommended Sleep</p>
+                    </div>
+                    <div class="glass-card p-4 rounded-2xl text-center">
+                        <p class="text-2xl sm:text-3xl font-bold text-amber-400">Delta Waves</p>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-1">Deep Relaxation</p>
+                    </div>
+                    <div class="glass-card p-4 rounded-2xl text-center">
+                        <p class="text-2xl sm:text-3xl font-bold text-purple-400">4 Creators</p>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-1">Student Innovation</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="player" class="py-20 px-4 sm:px-6 lg:px-8 relative">
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl sm:text-4xl font-bold text-white mb-3">Willowra Bedtime Audio Player</h2>
+                    <p class="text-slate-400 max-w-xl mx-auto">Experience our real-time synthesized soothing audio generated live in your browser using Web Audio frequencies.</p>
+                </div>
+
+                <div class="glass-card rounded-3xl p-6 sm:p-10 border-indigo-500/30 shadow-2xl relative overflow-hidden">
+                    <!-- Ambient Visualizer Display -->
+                    <div class="relative h-48 sm:h-60 rounded-2xl bg-midnight/80 border border-slate-800 flex items-center justify-center overflow-hidden mb-8">
+                        <!-- Soundwave Rings -->
+                        <div id="visualizerRing1" class="absolute w-32 h-32 rounded-full border border-indigo-500/20 transition-all duration-700"></div>
+                        <div id="visualizerRing2" class="absolute w-48 h-48 rounded-full border border-cyan-500/20 transition-all duration-700"></div>
+                        <div id="visualizerRing3" class="absolute w-64 h-64 rounded-full border border-purple-500/10 transition-all duration-700"></div>
+
+                        <!-- Center Audio Icon -->
+                        <div class="relative z-10 text-center">
+                            <div id="playerIconContainer" class="w-20 h-20 rounded-full bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center mx-auto mb-3 shadow-lg transition-transform duration-500">
+                                <i data-lucide="cloud-rain" id="currentTrackIcon" class="w-10 h-10 text-cyan-400"></i>
+                            </div>
+                            <h3 id="currentTrackTitle" class="text-xl font-bold text-white">Rain & Thunder Ambient</h3>
+                            <p id="currentTrackDesc" class="text-xs text-slate-400 mt-1">Calm rhythmic raindrops with soothing deep resonance</p>
+                        </div>
+
+                        <!-- Equalizer Animation Bars -->
+                        <div id="equalizerBars" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-end gap-1.5 h-8 opacity-40">
+                            <div class="w-1 bg-cyan-400 rounded-full h-2 transition-all duration-300 bar"></div>
+                            <div class="w-1 bg-cyan-400 rounded-full h-5 transition-all duration-300 bar"></div>
+                            <div class="w-1 bg-cyan-400 rounded-full h-3 transition-all duration-300 bar"></div>
+                            <div class="w-1 bg-cyan-400 rounded-full h-7 transition-all duration-300 bar"></div>
+                            <div class="w-1 bg-cyan-400 rounded-full h-4 transition-all duration-300 bar"></div>
+                            <div class="w-1 bg-cyan-400 rounded-full h-6 transition-all duration-300 bar"></div>
+                            <div class="w-1 bg-cyan-400 rounded-full h-2 transition-all duration-300 bar"></div>
+                        </div>
+                    </div>
+
+                    <!-- Audio Controls Bar -->
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 mb-8">
+                        <div class="flex items-center gap-4">
+                            <button id="playPauseBtn" class="w-14 h-14 rounded-2xl bg-gradient-to-r from-indigo-600 to-cyan-500 hover:scale-105 active:scale-95 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30 transition-all">
+                                <i data-lucide="play" id="playIcon" class="w-7 h-7 fill-white ml-0.5"></i>
+                            </button>
+                            <div>
+                                <span id="statusLabel" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</span>
+                                <p id="statusText" class="text-sm font-medium text-slate-200">Ready to Play</p>
+                            </div>
+                        </div>
+
+                        <!-- Timer Controls -->
+                        <div class="flex items-center gap-2 bg-slate-900/80 p-1.5 rounded-xl border border-slate-800">
+                            <span class="text-xs text-slate-400 px-2 font-medium">Timer:</span>
+                            <button class="timer-btn px-3 py-1.5 text-xs rounded-lg text-slate-300 hover:bg-indigo-600/30 transition-colors active" data-time="0">Off</button>
+                            <button class="timer-btn px-3 py-1.5 text-xs rounded-lg text-slate-300 hover:bg-indigo-600/30 transition-colors" data-time="15">15m</button>
+                            <button class="timer-btn px-3 py-1.5 text-xs rounded-lg text-slate-300 hover:bg-indigo-600/30 transition-colors" data-time="30">30m</button>
+                            <button class="timer-btn px-3 py-1.5 text-xs rounded-lg text-slate-300 hover:bg-indigo-600/30 transition-colors" data-time="60">60m</button>
+                        </div>
+
+                        <!-- Volume Slider -->
+                        <div class="flex items-center gap-3 w-full sm:w-auto">
+                            <i data-lucide="volume-2" class="w-5 h-5 text-slate-400"></i>
+                            <input id="volumeSlider" type="range" min="0" max="100" value="70" class="w-full sm:w-28 accent-cyan-400 bg-slate-800 rounded-lg h-2">
+                        </div>
+                    </div>
+
+                    <!-- Soundscape Selector Preset Cards -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <button class="track-card p-3 rounded-xl border border-indigo-500/50 bg-indigo-950/40 text-left transition-all hover:bg-slate-800 flex items-center gap-3 active-track" data-track="rain">
+                            <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
+                                <i data-lucide="cloud-rain" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Rain & Thunder</p>
+                                <p class="text-[10px] text-slate-400">Pink noise rain</p>
+                            </div>
+                        </button>
+
+                        <button class="track-card p-3 rounded-xl border border-slate-800 bg-slate-900/50 text-left transition-all hover:bg-slate-800 flex items-center gap-3" data-track="space">
+                            <div class="p-2 rounded-lg bg-purple-500/10 text-purple-400">
+                                <i data-lucide="sparkles" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Deep Space Drone</p>
+                                <p class="text-[10px] text-slate-400">Sub-bass hum</p>
+                            </div>
+                        </button>
+
+                        <button class="track-card p-3 rounded-xl border border-slate-800 bg-slate-900/50 text-left transition-all hover:bg-slate-800 flex items-center gap-3" data-track="waves">
+                            <div class="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+                                <i data-lucide="waves" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Ocean Tide Wave</p>
+                                <p class="text-[10px] text-slate-400">Rhythmic swells</p>
+                            </div>
+                        </button>
+
+                        <button class="track-card p-3 rounded-xl border border-slate-800 bg-slate-900/50 text-left transition-all hover:bg-slate-800 flex items-center gap-3" data-track="delta">
+                            <div class="p-2 rounded-lg bg-amber-500/10 text-amber-400">
+                                <i data-lucide="disc" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Delta Waves</p>
+                                <p class="text-[10px] text-slate-400">2.5 Hz binaural tone</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-20 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Designed for Teen Sleep Health</span>
+                    <h2 class="text-3xl sm:text-5xl font-bold text-white mt-2">Core Willowra Features</h2>
+                    <p class="text-slate-400 mt-4 max-w-2xl mx-auto">Customized sleep intervention tools built specifically for teenage circadian rhythms and daily school pressures.</p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="glass-card glass-card-hover p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-6">
+                                <i data-lucide="activity" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Sleep Tracking & Analytics</h3>
+                            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+                                Log sleep duration, bedtime consistency, and wake feelings. Visualize teen sleep efficiency and identify key triggers disrupting sleep patterns.
+                            </p>
+                        </div>
+                        <!-- Mini Chart Preview -->
+                        <div class="bg-midnight/80 p-4 rounded-xl border border-slate-800">
+                            <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                                <span>Weekly Sleep Avg</span>
+                                <span class="text-emerald-400 font-semibold">+1.5 hrs/night</span>
+                            </div>
+                            <canvas id="miniSleepChart" height="100"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="glass-card glass-card-hover p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-cyan-500/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6">
+                                <i data-lucide="music" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Relaxation Music & Soundscapes</h3>
+                            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+                                Specially curated audio mixes using binaural beats and ambient frequencies engineered to lower cortisol levels and induce deep restorative REM sleep.
+                            </p>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 flex items-center justify-between text-xs">
+                                <span class="flex items-center gap-2 text-slate-300"><i data-lucide="check-circle2" class="w-4 h-4 text-cyan-400"></i> Melatonin-inducing tones</span>
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 flex items-center justify-between text-xs">
+                                <span class="flex items-center gap-2 text-slate-300"><i data-lucide="check-circle2" class="w-4 h-4 text-cyan-400"></i> No sudden audio spikes</span>
+                            </div>
+                            <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800 flex items-center justify-between text-xs">
+                                <span class="flex items-center gap-2 text-slate-300"><i data-lucide="check-circle2" class="w-4 h-4 text-cyan-400"></i> Custom mix generator</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="glass-card glass-card-hover p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-6">
+                                <i data-lucide="alarm-clock" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-3">Bedtime Planner & Smart Alarms</h3>
+                            <p class="text-slate-300 text-sm leading-relaxed mb-6">
+                                Prevents late-night screen time trap with gentle wind-down notifications and smart wake alarms timed to natural 90-minute sleep cycles.
+                            </p>
+                        </div>
+                        <div class="bg-midnight/80 p-4 rounded-xl border border-slate-800 flex items-center gap-3">
+                            <div class="p-2 rounded-lg bg-amber-500/20 text-amber-400">
+                                <i data-lucide="bell-ring" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs font-bold text-white">Smart Wind-down Reminder</p>
+                                <p class="text-[10px] text-slate-400">Triggered 45 min before sleep target</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="education" class="py-20 px-4 sm:px-6 lg:px-8 relative bg-slate-950/50">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Science & Awareness</span>
+                    <h2 class="text-3xl sm:text-5xl font-bold text-white mt-2">Understanding Teen Sleep Disorders</h2>
+                    <p class="text-slate-400 mt-4 max-w-2xl mx-auto">Teen biology naturally shifts sleep phases late, but school schedules start early. Here is why sleep health matters.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
+                    <!-- Left: Educational Breakdown -->
+                    <div class="space-y-6">
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-l-indigo-500">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i data-lucide="alert-circle" class="w-5 h-5 text-indigo-400"></i> What Happens When Sleep is Disturbed?
+                            </h3>
+                            <p class="text-slate-300 text-sm mt-2 leading-relaxed">
+                                Chronic sleep deprivation in adolescents impairs brain development, lowers academic focus, spikes anxiety, weakens immunity, and increases emotional reactivity.
+                            </p>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-l-cyan-500">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i data-lucide="clock" class="w-5 h-5 text-cyan-400"></i> The Teenage Circadian Rhythm Shift
+                            </h3>
+                            <p class="text-slate-300 text-sm mt-2 leading-relaxed">
+                                During puberty, melatonin secretion is naturally delayed by up to 2 hours, making it biological for teens to fall asleep later (e.g., 11 PM vs 9 PM).
+                            </p>
+                        </div>
+
+                        <div class="glass-card p-6 rounded-2xl border-l-4 border-l-purple-500">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i data-lucide="smartphone-off" class="w-5 h-5 text-purple-400"></i> Screen Blue Light Impact
+                            </h3>
+                            <p class="text-slate-300 text-sm mt-2 leading-relaxed">
+                                Blue light from smartphones trick the brain into thinking it is daytime, suppressing melatonin release and disrupting deep delta sleep.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Myths vs Facts Interactive Accordion -->
+                    <div class="glass-card p-6 sm:p-8 rounded-3xl">
+                        <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <i data-lucide="help-circle" class="w-6 h-6 text-amber-400"></i> Teen Sleep Myths vs. Facts
+                        </h3>
+
+                        <div class="space-y-4">
+                            <!-- Myth 1 -->
+                            <div class="bg-slate-900/80 rounded-xl overflow-hidden border border-slate-800">
+                                <button class="w-full p-4 text-left font-semibold text-slate-200 flex justify-between items-center hover:text-cyan-400 transition-colors accordion-toggle">
+                                    <span>Myth: "Teens can catch up on lost sleep on weekends"</span>
+                                    <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300"></i>
+                                </button>
+                                <div class="px-4 pb-4 hidden text-sm text-slate-400 border-t border-slate-800/50 pt-3">
+                                    <strong class="text-emerald-400">Fact:</strong> "Catch-up sleep" disrupts your circadian rhythm even further, causing "social jetlag" on Monday mornings. Consistency is key.
+                                </div>
+                            </div>
+
+                            <!-- Myth 2 -->
+                            <div class="bg-slate-900/80 rounded-xl overflow-hidden border border-slate-800">
+                                <button class="w-full p-4 text-left font-semibold text-slate-200 flex justify-between items-center hover:text-cyan-400 transition-colors accordion-toggle">
+                                    <span>Myth: "Tired teens are just lazy"</span>
+                                    <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300"></i>
+                                </button>
+                                <div class="px-4 pb-4 hidden text-sm text-slate-400 border-t border-slate-800/50 pt-3">
+                                    <strong class="text-emerald-400">Fact:</strong> Teen fatigue is primarily biological caused by shifted sleep cycles and early school bell timings, not lack of motivation.
+                                </div>
+                            </div>
+
+                            <!-- Myth 3 -->
+                            <div class="bg-slate-900/80 rounded-xl overflow-hidden border border-slate-800">
+                                <button class="w-full p-4 text-left font-semibold text-slate-200 flex justify-between items-center hover:text-cyan-400 transition-colors accordion-toggle">
+                                    <span>Myth: "Late night study cramming improves grades"</span>
+                                    <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300"></i>
+                                </button>
+                                <div class="px-4 pb-4 hidden text-sm text-slate-400 border-t border-slate-800/50 pt-3">
+                                    <strong class="text-emerald-400">Fact:</strong> Memory consolidation happens during REM and deep slow-wave sleep. All-nighters reduce memory retention by up to 40%.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tools" class="py-20 px-4 sm:px-6 lg:px-8">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="text-xs font-bold text-indigo-400 uppercase tracking-widest">Interactive Utilities</span>
+                    <h2 class="text-3xl sm:text-5xl font-bold text-white mt-2">Teen Sleep Tools</h2>
+                    <p class="text-slate-400 mt-4 max-w-xl mx-auto">Calculate your optimum bedtime based on 90-minute sleep cycles and evaluate your sleep health score.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Tool 1: Bedtime Calculator -->
+                    <div class="glass-card p-6 sm:p-8 rounded-3xl flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-3 mb-6">
+                                <div class="p-3 rounded-xl bg-cyan-500/20 text-cyan-400">
+                                    <i data-lucide="calculator" class="w-6 h-6"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">90-Min Sleep Cycle Calculator</h3>
+                                    <p class="text-xs text-slate-400">Avoid waking up groggy in the middle of deep sleep</p>
+                                </div>
+                            </div>
+
+                            <label class="block text-sm font-semibold text-slate-300 mb-2">What time do you need to wake up for school?</label>
+                            <input type="time" id="wakeTime" value="06:30" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white text-lg focus:outline-none focus:border-cyan-400 mb-6">
+
+                            <button id="calcBedtimeBtn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 font-bold text-white shadow-lg hover:opacity-90 transition-opacity">
+                                Calculate Optimum Bedtimes
+                            </button>
+
+                            <div id="calculatorResults" class="mt-6 hidden">
+                                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Suggested Bedtimes (to wake refreshed):</p>
+                                <div class="grid grid-cols-3 gap-3" id="bedtimeChips">
+                                    <!-- Dynamic chips filled via JS -->
+                                </div>
+                                <p class="text-[11px] text-slate-400 mt-3">* Includes an average 15 minutes needed to fall asleep.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tool 2: Sleep Self-Assessment Quiz -->
+                    <div class="glass-card p-6 sm:p-8 rounded-3xl">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-3 rounded-xl bg-purple-500/20 text-purple-400">
+                                <i data-lucide="clipboard-list" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Teen Sleep Health Quiz</h3>
+                                <p class="text-xs text-slate-400">Check if you are showing signs of sleep deprivation</p>
+                            </div>
+                        </div>
+
+                        <div id="quizContainer" class="space-y-4">
+                            <div class="quiz-step">
+                                <p class="text-sm font-semibold text-slate-200 mb-2">1. How long does it usually take you to fall asleep?</p>
+                                <div class="space-y-2">
+                                    <button class="quiz-opt w-full text-left p-3 text-xs rounded-xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500 transition-colors" data-score="0">Under 20 minutes</button>
+                                    <button class="quiz-opt w-full text-left p-3 text-xs rounded-xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500 transition-colors" data-score="1">20 - 45 minutes</button>
+                                    <button class="quiz-opt w-full text-left p-3 text-xs rounded-xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500 transition-colors" data-score="2">Over 45 minutes</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="quizResult" class="hidden text-center py-6">
+                            <div class="w-16 h-16 rounded-full bg-indigo-600/20 border border-indigo-400 text-indigo-400 flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="award" class="w-8 h-8"></i>
+                            </div>
+                            <h4 id="quizScoreTitle" class="text-lg font-bold text-white">Your Sleep Score</h4>
+                            <p id="quizScoreDesc" class="text-xs text-slate-300 mt-2 leading-relaxed max-w-sm mx-auto"></p>
+                            <button id="resetQuizBtn" class="mt-4 px-4 py-2 text-xs rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300">Retake Quiz</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="creators" class="py-20 px-4 sm:px-6 lg:px-8 relative bg-slate-950/40">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-16">
+                    <span class="text-xs font-bold text-amber-400 uppercase tracking-widest">Innovation & Vision</span>
+                    <h2 class="text-3xl sm:text-5xl font-bold text-white mt-2">Meet the Creators</h2>
+                    <p class="text-slate-400 mt-4 max-w-xl mx-auto">The passionate team behind Willowra, working to revolutionize teen bedtime wellness.</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Creator 1 -->
+                    <div class="glass-card glass-card-hover p-6 rounded-3xl text-center group relative">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-400 p-1 mx-auto mb-4 shadow-xl shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+                            <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-2xl font-black text-indigo-300">
+                                AK
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">Arnav Kumar</h3>
+                        <p class="text-xs font-semibold text-indigo-400 mt-1 uppercase tracking-wider">Lead Innovator & UI Specialist</p>
+                        <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+                            Spearheaded the conceptual architecture and user experience design tailored to adolescent sleep habits.
+                        </p>
+                    </div>
+
+                    <!-- Creator 2 -->
+                    <div class="glass-card glass-card-hover p-6 rounded-3xl text-center group relative">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-cyan-500 to-emerald-400 p-1 mx-auto mb-4 shadow-xl shadow-cyan-500/20 group-hover:scale-105 transition-transform">
+                            <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-2xl font-black text-cyan-300">
+                                AB
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">Ashvik Bansal</h3>
+                        <p class="text-xs font-semibold text-cyan-400 mt-1 uppercase tracking-wider">Audio Engineer & Sound Designer</p>
+                        <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+                            Crafted the ambient acoustic soundscapes and frequency tones engineered for deep relaxation.
+                        </p>
+                    </div>
+
+                    <!-- Creator 3 -->
+                    <div class="glass-card glass-card-hover p-6 rounded-3xl text-center group relative">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-purple-500 to-pink-500 p-1 mx-auto mb-4 shadow-xl shadow-purple-500/20 group-hover:scale-105 transition-transform">
+                            <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-2xl font-black text-purple-300">
+                                AG
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">Anchit Gupta</h3>
+                        <p class="text-xs font-semibold text-purple-400 mt-1 uppercase tracking-wider">Lead Web Architect</p>
+                        <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+                            Developed core interactive web features, real-time Web Audio synths, and responsive interfaces.
+                        </p>
+                    </div>
+
+                    <!-- Creator 4 -->
+                    <div class="glass-card glass-card-hover p-6 rounded-3xl text-center group relative">
+                        <div class="w-24 h-24 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 p-1 mx-auto mb-4 shadow-xl shadow-amber-500/20 group-hover:scale-105 transition-transform">
+                            <div class="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-2xl font-black text-amber-300">
+                                AK
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors">Aarnav Kansal</h3>
+                        <p class="text-xs font-semibold text-amber-400 mt-1 uppercase tracking-wider">Sleep Health Researcher</p>
+                        <p class="text-xs text-slate-400 mt-3 leading-relaxed">
+                            Researched teen circadian physiology and structured educational strategies to fight sleep disorders.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="border-t border-slate-800/80 bg-midnight relative z-10 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold">
+                    W
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-white">Willowra</p>
+                    <p class="text-xs text-slate-500">A relaxing audio app designed for bedtime</p>
+                </div>
+            </div>
+
+            <p class="text-xs text-slate-500 text-center md:text-left">
+                Created with passion by <span class="text-slate-300">Arnav Kumar, Ashvik Bansal, Anchit Gupta, and Aarnav Kansal</span>.
+            </p>
+
+            <div class="flex items-center gap-4 text-xs text-slate-400">
+                <a href="#player" class="hover:text-cyan-400 transition-colors">Audio Player</a>
+                <a href="#tools" class="hover:text-cyan-400 transition-colors">Sleep Calculator</a>
+                <a href="#education" class="hover:text-cyan-400 transition-colors">Sleep Health</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Canvas Particle Starfield Background
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        let stars = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initStars();
+        }
+
+        function initStars() {
+            stars = [];
+            const count = Math.floor((canvas.width * canvas.height) / 8000);
+            for (let i = 0; i < count; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5,
+                    alpha: Math.random(),
+                    speed: Math.random() * 0.01 + 0.005
+                });
+            }
+        }
+
+        function drawStars() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            stars.forEach(s => {
+                s.alpha += s.speed;
+                if (s.alpha > 1 || s.alpha < 0) s.speed = -s.speed;
+                ctx.beginPath();
+                ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(186, 230, 253, ${Math.abs(s.alpha)})`;
+                ctx.fill();
+            });
+            requestAnimationFrame(drawStars);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        drawStars();
+
+        // Mobile Menu Toggle
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const mobileDrawer = document.getElementById('mobileDrawer');
+        mobileBtn.addEventListener('click', () => {
+            mobileDrawer.classList.toggle('hidden');
+        });
+
+        // Interactive Audio Synthesizer (Web Audio API)
+        let audioCtx = null;
+        let isPlaying = false;
+        let currentTrack = 'rain';
+        let mainGain = null;
+        let timerTimeout = null;
+        let synthNodes = [];
+
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.getElementById('playIcon');
+        const statusText = document.getElementById('statusText');
+        const currentTrackTitle = document.getElementById('currentTrackTitle');
+        const currentTrackDesc = document.getElementById('currentTrackDesc');
+        const currentTrackIcon = document.getElementById('currentTrackIcon');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const visualizerRing1 = document.getElementById('visualizerRing1');
+        const visualizerRing2 = document.getElementById('visualizerRing2');
+
+        const trackMeta = {
+            rain: {
+                title: 'Rain & Thunder Ambient',
+                desc: 'Calm rhythmic raindrops with soothing deep resonance',
+                icon: 'cloud-rain',
+                type: 'rain'
+            },
+            space: {
+                title: 'Deep Space Drone',
+                desc: 'Sub-bass harmonic hum designed to reduce brain activity',
+                icon: 'sparkles',
+                type: 'space'
+            },
+            waves: {
+                title: 'Ocean Tide Wave',
+                desc: 'Rhythmic oceanic swells slowing breathing rate',
+                icon: 'waves',
+                type: 'waves'
+            },
+            delta: {
+                title: 'Delta Waves (2.5 Hz)',
+                desc: 'Binaural frequencies prompting restorative REM sleep',
+                icon: 'disc',
+                type: 'delta'
+            }
+        };
+
+        function initAudioContext() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                mainGain = audioCtx.createGain();
+                mainGain.gain.value = volumeSlider.value / 100;
+                mainGain.connect(audioCtx.destination);
+            }
+        }
+
+        function stopCurrentSynth() {
+            synthNodes.forEach(node => {
+                try {
+                    if (node.stop) node.stop();
+                    if (node.disconnect) node.disconnect();
+                } catch(e) {}
+            });
+            synthNodes = [];
+        }
+
+        function startSynth(type) {
+            initAudioContext();
+            stopCurrentSynth();
+
+            if (type === 'rain') {
+                // Pink/white noise buffer generator
+                const bufferSize = audioCtx.sampleRate * 2;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = (Math.random() * 2 - 1) * 0.15;
+                }
+                const whiteNoise = audioCtx.createBufferSource();
+                whiteNoise.buffer = buffer;
+                whiteNoise.loop = true;
+
+                // Lowpass filter for soft rain effect
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 800;
+
+                whiteNoise.connect(filter);
+                filter.connect(mainGain);
+                whiteNoise.start();
+                synthNodes.push(whiteNoise, filter);
+            } else if (type === 'space') {
+                // Low sub-bass sine wave oscillator
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                osc1.type = 'sine';
+                osc2.type = 'triangle';
+                osc1.frequency.value = 65; // C2 tone
+                osc2.frequency.value = 130.81; // C3 tone
+
+                const gainSpace = audioCtx.createGain();
+                gainSpace.gain.value = 0.2;
+
+                osc1.connect(gainSpace);
+                osc2.connect(gainSpace);
+                gainSpace.connect(mainGain);
+
+                osc1.start();
+                osc2.start();
+                synthNodes.push(osc1, osc2, gainSpace);
+            } else if (type === 'waves') {
+                // LFO modulated noise simulating ocean tides
+                const bufferSize = audioCtx.sampleRate * 2;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const output = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    output[i] = (Math.random() * 2 - 1) * 0.1;
+                }
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+                noise.loop = true;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.value = 400;
+
+                const lfo = audioCtx.createOscillator();
+                lfo.frequency.value = 0.15; // slow 6 sec swell cycle
+                const lfoGain = audioCtx.createGain();
+                lfoGain.gain.value = 300;
+
+                lfo.connect(lfoGain);
+                lfoGain.connect(filter.frequency);
+
+                noise.connect(filter);
+                filter.connect(mainGain);
+
+                noise.start();
+                lfo.start();
+                synthNodes.push(noise, filter, lfo, lfoGain);
+            } else if (type === 'delta') {
+                // Binaural beats (100Hz left, 102.5Hz right for 2.5Hz Delta beat)
+                const merger = audioCtx.createChannelMerger(2);
+
+                const oscL = audioCtx.createOscillator();
+                const oscR = audioCtx.createOscillator();
+                oscL.frequency.value = 100;
+                oscR.frequency.value = 102.5;
+
+                oscL.connect(merger, 0, 0); // left channel
+                oscR.connect(merger, 0, 1); // right channel
+
+                const deltaGain = audioCtx.createGain();
+                deltaGain.gain.value = 0.25;
+
+                merger.connect(deltaGain);
+                deltaGain.connect(mainGain);
+
+                oscL.start();
+                oscR.start();
+                synthNodes.push(oscL, oscR, merger, deltaGain);
+            }
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                stopCurrentSynth();
+                isPlaying = false;
+                playIcon.setAttribute('data-lucide', 'play');
+                statusText.innerText = 'Paused';
+                statusText.classList.remove('text-cyan-400');
+                visualizerRing1.style.transform = 'scale(1)';
+                visualizerRing2.style.transform = 'scale(1)';
+            } else {
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                startSynth(currentTrack);
+                isPlaying = true;
+                playIcon.setAttribute('data-lucide', 'pause');
+                statusText.innerText = 'Now Playing';
+                statusText.classList.add('text-cyan-400');
+                visualizerRing1.style.transform = 'scale(1.15)';
+                visualizerRing2.style.transform = 'scale(1.25)';
+            }
+            lucide.createIcons();
+        }
+
+        playPauseBtn.addEventListener('click', togglePlay);
+
+        // Volume Change
+        volumeSlider.addEventListener('input', (e) => {
+            if (mainGain) {
+                mainGain.gain.value = e.target.value / 100;
+            }
+        });
+
+        // Track Selector buttons
+        document.querySelectorAll('.track-card').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.track-card').forEach(c => {
+                    c.classList.remove('border-indigo-500/50', 'bg-indigo-950/40', 'active-track');
+                    c.classList.add('border-slate-800', 'bg-slate-900/50');
+                });
+                btn.classList.add('border-indigo-500/50', 'bg-indigo-950/40', 'active-track');
+
+                const track = btn.dataset.track;
+                currentTrack = track;
+                const meta = trackMeta[track];
+
+                currentTrackTitle.innerText = meta.title;
+                currentTrackDesc.innerText = meta.desc;
+                currentTrackIcon.setAttribute('data-lucide', meta.icon);
+                lucide.createIcons();
+
+                if (isPlaying) {
+                    startSynth(currentTrack);
+                }
+            });
+        });
+
+        // Sleep Timer Selection
+        document.querySelectorAll('.timer-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('bg-indigo-600', 'text-white'));
+                btn.classList.add('bg-indigo-600', 'text-white');
+
+                const mins = parseInt(btn.dataset.time);
+                if (timerTimeout) clearTimeout(timerTimeout);
+
+                if (mins > 0) {
+                    statusText.innerText = `Timer set: ${mins}m`;
+                    timerTimeout = setTimeout(() => {
+                        if (isPlaying) togglePlay();
+                        statusText.innerText = 'Timer finished';
+                    }, mins * 60 * 1000);
+                } else {
+                    statusText.innerText = isPlaying ? 'Now Playing' : 'Ready to Play';
+                }
+            });
+        });
+
+        // Mini Chart.js rendered for App Features
+        const ctxChart = document.getElementById('miniSleepChart').getContext('2d');
+        new Chart(ctxChart, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Hours of Sleep',
+                    data: [6.2, 6.5, 7.0, 7.8, 8.2, 8.5, 8.4],
+                    borderColor: '#06B6D4',
+                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#4F46E5'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#64748B', font: { size: 10 } } },
+                    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748B', font: { size: 10 } }, min: 5, max: 10 }
+                }
+            }
+        });
+
+        // Educational Accordion Toggle
+        document.querySelectorAll('.accordion-toggle').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                const icon = button.querySelector('i');
+                const isHidden = content.classList.contains('hidden');
+
+                document.querySelectorAll('.accordion-toggle').forEach(b => {
+                    b.nextElementSibling.classList.add('hidden');
+                    const ic = b.querySelector('i');
+                    if (ic) ic.style.transform = 'rotate(0deg)';
+                });
+
+                if (isHidden) {
+                    content.classList.remove('hidden');
+                    if (icon) icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+
+        // Bedtime Calculator Logic
+        document.getElementById('calcBedtimeBtn').addEventListener('click', () => {
+            const wakeVal = document.getElementById('wakeTime').value;
+            if (!wakeVal) return;
+
+            const [hours, minutes] = wakeVal.split(':').map(Number);
+            let wakeDate = new Date();
+            wakeDate.setHours(hours, minutes, 0, 0);
+
+            // Calculate 6, 5, and 4 sleep cycles (90 mins each + 15 min fall asleep)
+            const cycles = [6, 5, 4];
+            const chipsContainer = document.getElementById('bedtimeChips');
+            chipsContainer.innerHTML = '';
+
+            cycles.forEach(c => {
+                let bedTime = new Date(wakeDate.getTime() - (c * 90 * 60 * 1000) - (15 * 60 * 1000));
+                let formatted = bedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const chip = document.createElement('div');
+                chip.className = 'p-3 rounded-xl bg-slate-900 border border-slate-700 text-center';
+                chip.innerHTML = `
+                    <p class="text-sm font-bold text-cyan-400">${formatted}</p>
+                    <p class="text-[10px] text-slate-400 mt-1">${c} Cycles (${c * 1.5} hrs)</p>
+                `;
+                chipsContainer.appendChild(chip);
+            });
+
+            document.getElementById('calculatorResults').classList.remove('hidden');
+        });
+
+        // Interactive Quiz Logic
+        const quizQuestions = [
+            {
+                q: "1. How long does it usually take you to fall asleep?",
+                opts: [
+                    { txt: "Under 20 minutes", pts: 0 },
+                    { txt: "20 - 45 minutes", pts: 1 },
+                    { txt: "Over 45 minutes", pts: 2 }
+                ]
+            },
+            {
+                q: "2. How often do you feel exhausted during school hours?",
+                opts: [
+                    { txt: "Rarely or never", pts: 0 },
+                    { txt: "1-2 days a week", pts: 1 },
+                    { txt: "Almost every day", pts: 2 }
+                ]
+            },
+            {
+                q: "3. Do you use your mobile phone/screen in bed right before sleeping?",
+                opts: [
+                    { txt: "No, screens off 30 min before", pts: 0 },
+                    { txt: "Sometimes for a few minutes", pts: 1 },
+                    { txt: "Yes, right until I fall asleep", pts: 2 }
+                ]
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let totalScore = 0;
+
+        function renderQuizStep() {
+            const container = document.getElementById('quizContainer');
+            if (currentQuizIndex >= quizQuestions.length) {
+                showQuizResult();
+                return;
+            }
+
+            const q = quizQuestions[currentQuizIndex];
+            let html = `
+                <div class="quiz-step">
+                    <p class="text-sm font-semibold text-slate-200 mb-3">${q.q}</p>
+                    <div class="space-y-2">
+            `;
+            q.opts.forEach((opt) => {
+                html += `
+                    <button class="quiz-btn w-full text-left p-3 text-xs rounded-xl bg-slate-900/80 border border-slate-800 hover:border-indigo-500 hover:bg-slate-800 transition-colors" data-pts="${opt.pts}">
+                        ${opt.txt}
+                    </button>
+                `;
+            });
+            html += `</div></div>`;
+            container.innerHTML = html;
+
+            document.querySelectorAll('.quiz-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    totalScore += parseInt(btn.dataset.pts);
+                    currentQuizIndex++;
+                    renderQuizStep();
+                });
+            });
+        }
+
+        function showQuizResult() {
+            document.getElementById('quizContainer').classList.add('hidden');
+            const resBox = document.getElementById('quizResult');
+            resBox.classList.remove('hidden');
+
+            const title = document.getElementById('quizScoreTitle');
+            const desc = document.getElementById('quizScoreDesc');
+
+            if (totalScore <= 1) {
+                title.innerText = "Healthy Sleep Habit!";
+                desc.innerText = "You have great sleep hygiene! Willowra can help maintain your peak focus and athletic performance.";
+            } else if (totalScore <= 3) {
+                title.innerText = "Mild Sleep Disruption";
+                desc.innerText = "You experience occasional sleep delay. Using Willowra bedtime soundscapes can help calm screen-induced restlessness.";
+            } else {
+                title.innerText = "High Sleep Deprivation Risk";
+                desc.innerText = "Your sleep habits suggest significant circadian disruption. Willowra audio routines and smart bedtime planning are strongly recommended.";
+            }
+        }
+
+        document.getElementById('resetQuizBtn').addEventListener('click', () => {
+            currentQuizIndex = 0;
+            totalScore = 0;
+            document.getElementById('quizResult').classList.add('hidden');
+            document.getElementById('quizContainer').classList.remove('hidden');
+            renderQuizStep();
+        });
+
+        // Kickoff Quiz Render
+        renderQuizStep();
+    </script>
+</body>
+</html>
